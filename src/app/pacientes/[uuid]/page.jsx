@@ -2,9 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-
 import { useRouter } from "next/navigation";
 
 
@@ -127,76 +124,74 @@ const fetchTratamientos = async () => {
     lipoLaser: "Lipo Láser",
   };
 
-    const handleExportPDF = () => {
-    const doc = new jsPDF();
+   const handleExportPDF = async () => {
+  const { jsPDF } = await import("jspdf");
+  const autoTable = (await import("jspdf-autotable")).default;
 
+  const doc = new jsPDF();
 
-    doc.setFontSize(18);
-    doc.setTextColor(200, 0, 100);
-    doc.text("Clínica de Belleza SiluettePlus", 105, 15, { align: "center" });
+  doc.setFontSize(18);
+  doc.setTextColor(200, 0, 100);
+  doc.text("Clínica de Belleza SiluettePlus", 105, 15, { align: "center" });
 
+  if (paciente) {
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Paciente: ${paciente.nombre}`, 14, 30);
+    doc.text(`Correo: ${paciente.email}`, 14, 38);
+    doc.text(`Teléfono: ${paciente.phoneNumber}`, 14, 46);
+    doc.text(`Edad: ${paciente.age}`, 14, 54);
+    doc.text(`Estatura: ${paciente.height} m`, 14, 62);
+  }
 
-    if (paciente) {
-      doc.setFontSize(12);
-      doc.setTextColor(0, 0, 0);
-      doc.text(`Paciente: ${paciente.nombre}`, 14, 30);
-      doc.text(`Correo: ${paciente.email}`, 14, 38);
-      doc.text(`Teléfono: ${paciente.phoneNumber}`, 14, 46);
-      doc.text(`Edad: ${paciente.age}`, 14, 54);
-      doc.text(`Estatura: ${paciente.height} m`, 14, 62);
-    }
+  let yOffset = 75;
 
-    let yOffset = 75;
+  if (metricas.length > 0) {
+    autoTable(doc, {
+      startY: yOffset,
+      head: [["Semana", "Peso", "Grasa %", "Músculo", "IMC"]],
+      body: metricas.map(m => [
+        m.id, m.weight, m.fatPercentage, m.muscleKg, m.bmi
+      ]),
+    });
+    yOffset = doc.lastAutoTable.finalY + 10;
+  }
 
- 
-    if (metricas.length > 0) {
-      autoTable(doc, {
-        startY: yOffset,
-        head: [["Semana", "Peso", "Grasa %", "Músculo", "IMC"]],
-        body: metricas.map(m => [
-          m.id, m.weight, m.fatPercentage, m.muscleKg, m.bmi
-        ]),
-      });
-      yOffset = doc.lastAutoTable.finalY + 10;
-    }
+  if (abonos.length > 0) {
+    autoTable(doc, {
+      startY: yOffset,
+      head: [["Monto", "Semana", "Fecha"]],
+      body: abonos.map(a => [
+        `$${a.monto}`, a.semana, a.fechaAbono
+      ]),
+    });
+    yOffset = doc.lastAutoTable.finalY + 10;
+  }
 
+  if (citas.length > 0) {
+    autoTable(doc, {
+      startY: yOffset,
+      head: [["ID", "Fecha", "Hora", "Servicio"]],
+      body: citas.map(c => [
+        c.id, c.fecha, c.hora, c.servicio
+      ]),
+    });
+    yOffset = doc.lastAutoTable.finalY + 10;
+  }
 
-    if (abonos.length > 0) {
-      autoTable(doc, {
-        startY: yOffset,
-        head: [["Monto", "Semana", "Fecha"]],
-        body: abonos.map(a => [
-          `$${a.monto}`, a.semana, a.fechaAbono
-        ]),
-      });
-      yOffset = doc.lastAutoTable.finalY + 10;
-    }
+  if (tratamientos.length > 0) {
+    autoTable(doc, {
+      startY: yOffset,
+      head: [["ID", "Cavitación", "Radiofrecuencia", "Lipo Láser"]],
+      body: tratamientos.map(t => [
+        t.id, t.cavitation, t.radioFrequency, t.lipoLaser
+      ]),
+    });
+  }
 
-    // 🔹 Citas
-    if (citas.length > 0) {
-      autoTable(doc, {
-        startY: yOffset,
-        head: [["ID", "Fecha", "Hora", "Servicio"]],
-        body: citas.map(c => [
-          c.id, c.fecha, c.hora, c.servicio
-        ]),
-      });
-      yOffset = doc.lastAutoTable.finalY + 10;
-    }
+  doc.save(`Historial_${paciente?.nombre || "paciente"}.pdf`);
+};
 
-    // 🔹 Tratamientos
-    if (tratamientos.length > 0) {
-      autoTable(doc, {
-        startY: yOffset,
-        head: [["ID", "Cavitación", "Radiofrecuencia", "Lipo Láser"]],
-        body: tratamientos.map(t => [
-          t.id, t.cavitation, t.radioFrequency, t.lipoLaser
-        ]),
-      });
-    }
-
-    doc.save(`Historial_${paciente?.nombre || "paciente"}.pdf`);
-  };
 const router = useRouter();
 
 
