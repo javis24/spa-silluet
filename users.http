@@ -1,0 +1,46 @@
+### Crear usuario ADMIN
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+  "name": "Administrador General",
+  "email": "admin@siluetteplusjc.com",
+  "password": "Admin123!",
+  "role": "admin"
+}
+
+### Crear usuario SECRETARY
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+  "name": "Secretaria Clínica",
+  "email": "secretary@siluetteplusjc.com",
+  "password": "Secretary123!",
+  "role": "secretary"
+}
+
+### Crear usuario PACIENT
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+  "name": "Paciente Demo",
+  "email": "pacient@siluetteplusjc.com",
+  "password": "Pacient123!",
+  "role": "pacient"
+}
+
+
+### Login de usuario (genera token)
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@siluetteplusjc.com",
+  "password": "Admin123!"
+}
+
+
+###
+GET http://localhost:3000/api/users
