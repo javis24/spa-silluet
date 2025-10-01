@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation"; // Asegúrate de que es de 'next/navigation'
+import { useRouter } from "next/navigation"; 
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,9 +24,9 @@ export default function LoginPage() {
 
       const data = await res.json();
       if (res.ok) {
-        // Elimina el setTimeout
+      
         router.push("/dashboard");
-        router.refresh(); // Forzar una revalidación del router, puede ayudar con el middleware
+        router.refresh(); 
       } else {
         setError(data.msg || "Error en login");
       }
@@ -66,6 +66,18 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          <p className="mt-6 text-sm text-center text-gray-400">
+          ¿Se te olvidó tu contraseña o quieres una cuenta en{" "}
+          <span className="font-semibold text-pink-400">SiluettePlusJC</span>? <br />
+          <a
+            href="https://wa.me/5218713330566?text=Hola%20me%20gustaría%20recuperar%20mi%20contraseña%20o%20crear%20una%20cuenta%20en%20SiluettePlusJC"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-green-400 hover:text-green-500 font-medium"
+          >
+            Mándanos un mensaje por WhatsApp
+          </a>
+        </p>
           <button
             type="submit"
             className="w-full bg-pink-600 hover:bg-pink-700 text-white py-3 rounded-lg font-semibold shadow-md transition"

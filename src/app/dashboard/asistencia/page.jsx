@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AsistenciaPage() {
   const [registros, setRegistros] = useState([]);
@@ -44,10 +45,18 @@ export default function AsistenciaPage() {
     setUserId("");
     fetchRegistros();
   };
+  const router = useRouter();
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-pink-100 to-purple-200 p-6">
+       <button
+                onClick={() => router.push("/dashboard")}
+                className="mb-4 px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-800 text-sm sm:text-base"
+              >
+                ← Volver al inicio
+              </button>
       <h1 className="text-2xl font-bold text-pink-600 mb-6">Registro de Asistencia</h1>
+      
 
       <button
         onClick={() => setShowModal(true)}
@@ -71,7 +80,7 @@ export default function AsistenciaPage() {
           <tbody>
             {registros.map((r) => (
               <tr key={r.id} className="border-b text-pink-700">
-                <td className="p-2">{r.usuario?.name || r.userId}</td>
+                <td className="p-2">{r.usuario?.name }</td>
                 <td className="p-2">{r.fecha}</td>
                 <td className="p-2">{r.horaEntrada || "-"}</td>
                 <td className="p-2">{r.horaSalida || "-"}</td>

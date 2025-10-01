@@ -19,9 +19,9 @@ function applyAssociations() {
   MetricasSalud.belongsTo(Paciente, { foreignKey: "pacienteUuid", as: "paciente" });
   Paciente.hasMany(MetricasSalud, { foreignKey: "pacienteUuid", as: "metricas" });
 
-  // Users — RegistroAsistencia
-  RegistroAsistencia.belongsTo(Users, { foreignKey: "userId" });
-  Users.hasMany(RegistroAsistencia, { foreignKey: "userId" });
+// Users — RegistroAsistencia
+RegistroAsistencia.belongsTo(Users, { foreignKey: "userId", as: "usuario" });
+Users.hasMany(RegistroAsistencia, { foreignKey: "userId", as: "asistencias" });
 
   // Paciente — Cita
 Cita.belongsTo(Paciente, { foreignKey: "pacienteUuid", as: "paciente" });
