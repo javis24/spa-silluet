@@ -8,10 +8,14 @@ import TeamBenefits from "@/components/TeamBenefits";
 import CoursesSection from "@/components/CoursesSection";
 import Footer from "@/components/Footer";
 
+
 export const metadata = {
   title: "SiluettePlus | Clínica de Tratamientos Estéticos en Gómez Palacio",
   description:
     "Descubre los mejores tratamientos faciales, corporales y reductivos en SiluettePlus. Expertos en bienestar y belleza en Gómez Palacio, Durango.",
+    icons: {
+      icon: "/silluet_logo.ico",
+    },
   keywords:
     "spa, tratamientos estéticos, facial, corporal, cavitación, radiofrecuencia, SiluettePlus, Gómez Palacio, belleza, salud",
   authors: [{ name: "SiluettePlus" }],
@@ -23,7 +27,7 @@ export const metadata = {
     siteName: "SiluettePlus",
     images: [
       {
-        url: "/images/banner.jpg",
+        url: "/img/silluet_logo.png",
         width: 1200,
         height: 630,
         alt: "Tratamientos estéticos SiluettePlus",
@@ -36,7 +40,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "SiluettePlus | Clínica de Tratamientos Estéticos",
     description: "Agenda tu cita en SiluettePlus y luce espectacular.",
-    images: ["/images/banner.jpg"],
+    images: ["/img/silluet_logo.png"],
   },
 };
 
