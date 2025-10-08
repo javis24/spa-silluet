@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+
 
 export default function CitasPage() {
   const [form, setForm] = useState({
@@ -14,11 +17,11 @@ export default function CitasPage() {
   const [citas, setCitas] = useState([]);
   const [pacientes, setPacientes] = useState([]);
   const [editing, setEditing] = useState(null);
-
-  // 🔎 buscador + paginador
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
+
+  const router = useRouter();
 
   useEffect(() => {
     fetchCitas();
@@ -29,7 +32,6 @@ export default function CitasPage() {
     const res = await fetch("/api/citas");
     const data = await res.json();
 
-    // ordena por fecha+hora descendente
     const ordenadas = (Array.isArray(data) ? data : []).sort((a, b) => {
       const fechaHoraA = new Date(`${a.fecha}T${a.hora}`);
       const fechaHoraB = new Date(`${b.fecha}T${b.hora}`);
@@ -92,7 +94,6 @@ export default function CitasPage() {
     fetchCitas();
   };
 
-  // 🔎 filtrar citas
   const citasFiltradas = citas.filter(
     (c) =>
       c.fecha?.toLowerCase().includes(search.toLowerCase()) ||
@@ -101,7 +102,6 @@ export default function CitasPage() {
       c.comentario?.toLowerCase().includes(search.toLowerCase())
   );
 
-  // 📄 paginar
   const totalPages = Math.ceil(citasFiltradas.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const citasPaginadas = citasFiltradas.slice(
@@ -109,13 +109,52 @@ export default function CitasPage() {
     startIndex + itemsPerPage
   );
 
-  // reset a página 1 cuando se busca algo
   useEffect(() => {
     setCurrentPage(1);
   }, [search]);
 
-  const router = useRouter();
+  // 📄 === FUNCIONES PDF ===
+  const generarPDF = (lista, titulo = "Citas Registradas") => {
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text(titulo, 14, 15);
 
+    const tableColumn = ["Fecha", "Hora", "Servicio", "Comentario", "Paciente"];
+    const tableRows = [];
+
+    lista.forEach((c) => {
+      tableRows.push([
+        c.fecha,
+        c.hora,
+        c.servicio,
+        c.comentario,
+        c.paciente?.email || "Sin asignar",
+      ]);
+    });
+
+   autoTable(doc, {
+  head: [tableColumn],
+  body: tableRows,
+  startY: 25,
+});
+
+
+    doc.save(`${titulo.replaceAll(" ", "_")}.pdf`);
+  };
+
+  const handleDescargarTodo = () => {
+    generarPDF(citas, "Citas_Totales");
+  };
+
+  const handleDescargarPorCliente = (pacienteUuid) => {
+    const citasCliente = citas.filter((c) => c.pacienteUuid === pacienteUuid);
+    if (citasCliente.length === 0)
+      return alert("Este cliente no tiene citas registradas.");
+    const paciente = citasCliente[0]?.paciente?.email || "Cliente";
+    generarPDF(citasCliente, `Citas_de_${paciente}`);
+  };
+
+  // === RENDER ===
   return (
     <div className="min-h-screen flex bg-gradient-to-r from-pink-100 to-purple-200">
       <div className="flex-1 p-4 sm:p-6 relative">
@@ -126,6 +165,16 @@ export default function CitasPage() {
           ← Volver a inicio
         </button>
 
+        {/* 📄 Botón general de PDF */}
+        <div className="text-center mb-6">
+          <button
+            onClick={handleDescargarTodo}
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow"
+          >
+            📥 Descargar todas las citas en PDF
+          </button>
+        </div>
+
         {/* Formulario */}
         <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg mb-8 w-full max-w-md sm:max-w-2xl mx-auto">
           <h1 className="text-2xl sm:text-3xl font-bold text-pink-600 mb-6 text-center">
@@ -135,7 +184,6 @@ export default function CitasPage() {
             onSubmit={handleSubmit}
             className="grid grid-cols-1 sm:grid-cols-2 gap-4"
           >
-            {/* Paciente */}
             <select
               name="pacienteUuid"
               value={form.pacienteUuid}
@@ -197,7 +245,7 @@ export default function CitasPage() {
             Lista de Citas
           </h2>
 
-          {/* 🔎 Buscador */}
+          {/* Buscador */}
           <div className="mb-4 flex justify-center">
             <input
               type="text"
@@ -208,22 +256,7 @@ export default function CitasPage() {
             />
           </div>
 
-          {/* 📱 Mobile → Cards */}
-          <div className="block sm:hidden space-y-3">
-            {citasPaginadas.map((c) => (
-              <div
-                key={c.id}
-                className="border rounded-lg p-4 shadow-sm text-pink-700"
-              >
-                <p><strong>Fecha:</strong> {c.fecha}</p>
-                <p><strong>Hora:</strong> {c.hora}</p>
-                <p><strong>Servicio:</strong> {c.servicio}</p>
-                <p><strong>Comentario:</strong> {c.comentario}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* 💻 Desktop → Tabla */}
+          {/* Tabla */}
           <div className="hidden sm:block overflow-x-auto">
             <table className="w-full min-w-[500px] border-collapse text-sm sm:text-base">
               <thead>
@@ -232,7 +265,7 @@ export default function CitasPage() {
                   <th className="p-2">Hora</th>
                   <th className="p-2">Servicio</th>
                   <th className="p-2">Comentario</th>
-                   <th className="p-2">Email</th>
+                  <th className="p-2">Email</th>
                   <th className="p-2">Acciones</th>
                 </tr>
               </thead>
@@ -244,7 +277,6 @@ export default function CitasPage() {
                     <td className="p-2">{c.servicio}</td>
                     <td className="p-2">{c.comentario}</td>
                     <td className="p-2">{c.paciente?.email || "Sin asignar"}</td>
-
                     <td className="p-2 space-x-2">
                       <button
                         onClick={() => handleEdit(c)}
@@ -258,6 +290,12 @@ export default function CitasPage() {
                       >
                         Eliminar
                       </button>
+                      <button
+                        onClick={() => handleDescargarPorCliente(c.pacienteUuid)}
+                        className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                      >
+                        PDF Cliente
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -265,7 +303,7 @@ export default function CitasPage() {
             </table>
           </div>
 
-  
+          {/* Paginación */}
           <div className="flex justify-center mt-4 space-x-2">
             {Array.from({ length: totalPages }, (_, i) => (
               <button

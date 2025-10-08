@@ -7,6 +7,8 @@ export default function AbonoForm({ pacienteUuid, onClose, onSave, initialData }
     semana: "",
     fechaAbono: "",
   });
+  const [totalAbonos, setTotalAbonos] = useState(0);
+  const [abonos, setAbonos] = useState([]);
 
   // 🔹 Cargar datos cuando editamos
   useEffect(() => {
@@ -21,11 +23,36 @@ export default function AbonoForm({ pacienteUuid, onClose, onSave, initialData }
     }
   }, [initialData]);
 
+  // 🔹 Obtener todos los abonos del paciente
+  useEffect(() => {
+    if (pacienteUuid) {
+      fetchAbonos();
+    }
+  }, [pacienteUuid]);
+
+  const fetchAbonos = async () => {
+    try {
+      const res = await fetch(`/api/abonos?pacienteUuid=${pacienteUuid}`);
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setAbonos(data);
+        const total = data.reduce((sum, abono) => sum + Number(abono.monto || 0), 0);
+        setTotalAbonos(total);
+      } else {
+        setAbonos([]);
+        setTotalAbonos(0);
+      }
+    } catch (error) {
+      console.error("Error al obtener abonos:", error);
+    }
+  };
+
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async () => {
-    await onSave("abonos", { ...form, pacienteUuid }, initialData?.id); // si hay id => PUT
+    await onSave("abonos", { ...form, pacienteUuid }, initialData?.id);
+    fetchAbonos(); // 🔄 actualizar suma después de guardar
   };
 
   const labels = {
@@ -55,11 +82,37 @@ export default function AbonoForm({ pacienteUuid, onClose, onSave, initialData }
           />
         </div>
       ))}
+
+      {/* 🔹 Mostrar sumatoria total */}
+      <div className="mt-4 bg-pink-50 border border-pink-200 rounded-lg p-3 text-center">
+        <p className="text-sm text-pink-600 font-semibold">
+          Total abonado hasta ahora:
+        </p>
+        <p className="text-2xl font-bold text-pink-700">
+          ${totalAbonos.toLocaleString("es-MX", { minimumFractionDigits: 2 })}
+        </p>
+      </div>
+
+      {/* 🔹 Mostrar listado de abonos previos */}
+      {abonos.length > 0 && (
+        <div className="mt-4 border-t pt-3 max-h-40 overflow-y-auto">
+          <p className="text-sm font-semibold text-pink-600 mb-2">Historial de abonos:</p>
+          <ul className="text-sm text-pink-700 space-y-1">
+            {abonos.map((a) => (
+              <li key={a.id} className="flex justify-between border-b pb-1">
+                <span>
+                  Semana {a.semana} – {a.fechaAbono}
+                </span>
+                <span className="font-semibold">${a.monto}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </Modal>
   );
 }
 
-// 🔹 Modal base reutilizable
 function Modal({ title, children, onClose, onSave }) {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
