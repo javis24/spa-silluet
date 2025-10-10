@@ -77,6 +77,15 @@ export default function HomePage() {
         <CoursesSection />
       </main>
       <Footer />
+      <a
+          href="https://wa.me/528713330566?text=Hola!%20Estoy%20interesado%20en%20los%20tratamientos%20de%20SiluettePlus."
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-6 right-6 bg-green-500 text-white px-4 py-3 rounded-full shadow-lg flex items-center gap-2 hover:bg-green-600 transition"
+        >
+          💬 Consultar por WhatsApp
+        </a>
+
     </div>
   );
 }
