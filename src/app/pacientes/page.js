@@ -250,7 +250,7 @@ export default function PacientesPage() {
 
                 <div className="flex justify-between mt-3 gap-2">
                   <button
-                    onClick={() => router.push(`/dashboard/px/${p.uuid}`)}
+                    onClick={() => router.push(`/pacientes/${p.uuid}`)}
                     className="flex-1 bg-blue-400 text-white py-1 rounded hover:bg-blue-500"
                   >
                     Ver

@@ -262,7 +262,7 @@ const router = useRouter();
         data={tratamientos}
         fields={["id","cavitation", "radioFrequency", "lipoLaser"]}
         labels={labels}
-        endpoint="tratamientos-esteticos"   // 👈 corregido
+        endpoint="tratamientos-esteticos"  
         onAdd={() => setShowModal("tratamientos-esteticos")}
         onEdit={handleEdit}
         onDelete={handleDelete}
