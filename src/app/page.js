@@ -47,7 +47,7 @@ export const metadata = {
 const teamMembersData = [
   {
     name: "Nutrióloga Jackeline Corral",
-    role: "Nutriologa Estética",
+    role: "Nutriologa",
     description: "Especialista en terapias alternativas, aparatologia profesional y masajes Reductivos.",
      image: "./img/Jackeline.png",
   },
