@@ -46,23 +46,23 @@ export const metadata = {
 
 const teamMembersData = [
   {
-    name: "Dr. Elena García",
+    name: "Nutrióloga Jackeline Corral",
     role: "Dermatóloga Estética",
-    description: "Experta en rejuvenecimiento facial y tratamientos avanzados de la piel.",
-    image: "/img/team/elena.jpg",
+    description: "Especialista en terapias alternativas, aparatologia profesional y masajes Reductivos.",
+    image: "./img/01-jackeline.png",
   },
   {
-    name: "Carlos Méndez",
-    role: "Especialista en Masajes Terapéuticos",
-    description: "Maestro en técnicas de relajación y alivio del estrés.",
-    image: "/img/team/carlos.jpg",
+    name: "Oriandi",
+    role: "Terapeuta",
+    description: "Terapeuta en terapias alternativas, masajes reductivos  y aparatologia profesional",
+    image: "./img/01-oriandi.png",
   },
-  {
-    name: "Sofía Ramírez",
-    role: "Esteticista Corporal",
-    description: "Especialista en tratamientos reductivos y moldeado corporal.",
-    image: "/img/team/sofia.jpg",
-  },
+   {
+    name: "Sill|uettePlus",
+    role: "Spa de Belleza y Bienestar",
+    description: "SilluettePlus es una clínica especializada en tratamientos estéticos faciales y corporales, dedicada a realzar tu belleza y bienestar.",
+    image: "./img/silluet_letras.png",
+  }
 ];
 
 export default function HomePage() {
