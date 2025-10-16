@@ -49,7 +49,7 @@ const teamMembersData = [
     name: "Nutrióloga Jackeline Corral",
     role: "Dermatóloga Estética",
     description: "Especialista en terapias alternativas, aparatologia profesional y masajes Reductivos.",
-    image: "/img/01-jackeline.png",
+    image: "./img/01-jackeline.png",
   },
   {
     name: "Oriandi",
