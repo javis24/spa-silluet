@@ -10,7 +10,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -19,13 +19,18 @@ export default function LoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
-        credentials: "include",
       });
 
       const data = await res.json();
+
       if (res.ok) {
       
-        router.push("/dashboard");
+        if (data.user.role === "pacient") {
+           router.push("/portal");
+        } else {
+           router.push("/dashboard"); 
+        }
+        
         router.refresh(); 
       } else {
         setError(data.msg || "Error en login");

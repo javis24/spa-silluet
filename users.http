@@ -43,4 +43,4 @@ Content-Type: application/json
 
 
 ###
-GET http://localhost:3000/api/users
+GET http://localhost:3000/users/869ce347-576a-4c62-a133-8d47c3e36654
