@@ -1,10 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Ya no necesitamos 'bcrypt' aquí porque bcryptjs es JS puro.
-  // Mantenemos sequelize y mysql2 para que no den problemas de drivers.
+  // Activa el modo standalone para reducir consumo de memoria
+  output: 'standalone',
+
   serverExternalPackages: ['sequelize', 'mysql2'],
 
-  // Mantenemos las optimizaciones de memoria
+  // Ignorar errores de lint/types para que el build no falle por eso
   eslint: {
     ignoreDuringBuilds: true,
   },
