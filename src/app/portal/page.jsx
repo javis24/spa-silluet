@@ -1,6 +1,6 @@
 // src/app/portal/page.jsx
 import { getPatientWeeklyProgress } from "@/lib/data";
-import { redirect } from "next/navigation";
+export const dynamic = "force-dynamic";
 import Link from "next/link";
 
 export default async function PortalPage() {
