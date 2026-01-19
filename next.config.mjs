@@ -1,10 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // 1. IMPORTANTE: Agregamos 'bcrypt' aquí. 
-  // Al ser una librería nativa, rompe el build si Next.js intenta empaquetarla.
+  // 1. AGREGA 'bcrypt' AQUÍ. Esto evita que Vercel intente compilarlo y falle.
   serverExternalPackages: ['sequelize', 'mysql2', 'bcrypt'],
 
-  // 2. Optimizaciones de memoria para evitar el "WorkerError"
+  // 2. Optimizaciones para evitar que se acabe la memoria
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -12,7 +11,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
-  // 3. Configuración de Webpack para evitar advertencias de Sequelize
+  // 3. Configuración para evitar alertas de Sequelize
   webpack: (config) => {
     config.module.exprContextCritical = false;
     return config;
