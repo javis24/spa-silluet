@@ -1,14 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Activa el modo standalone para reducir consumo de memoria
+  // Modo Standalone para ahorrar mucha memoria en Vercel
   output: 'standalone',
 
+  // Paquetes externos para evitar conflictos de compilación
   serverExternalPackages: ['sequelize', 'mysql2'],
 
-  // Ignorar errores de lint/types para que el build no falle por eso
+  // 👇 ESTO SUSTITUYE AL COMANDO --no-lint
   eslint: {
     ignoreDuringBuilds: true,
   },
+  
+  // Ignoramos errores de TypeScript en el build
   typescript: {
     ignoreBuildErrors: true,
   },

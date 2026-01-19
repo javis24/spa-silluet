@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
- "scripts": {
+"scripts": {
     "dev": "next dev",
-    "build": "next build --no-lint", 
+    "build": "next build", 
     "start": "next start",
     "sync": "node sync.js",
     "lint": "eslint"
