@@ -1,17 +1,17 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // 1. AGREGA 'bcrypt' AQUÍ. Esto evita que Vercel intente compilarlo y falle.
-  serverExternalPackages: ['sequelize', 'mysql2', 'bcrypt'],
+  // Ya no necesitamos 'bcrypt' aquí porque bcryptjs es JS puro.
+  // Mantenemos sequelize y mysql2 para que no den problemas de drivers.
+  serverExternalPackages: ['sequelize', 'mysql2'],
 
-  // 2. Optimizaciones para evitar que se acabe la memoria
+  // Mantenemos las optimizaciones de memoria
   eslint: {
     ignoreDuringBuilds: true,
   },
   typescript: {
     ignoreBuildErrors: true,
   },
-
-  // 3. Configuración para evitar alertas de Sequelize
+  
   webpack: (config) => {
     config.module.exprContextCritical = false;
     return config;
