@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import Users from "@/models/User";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 // 📌 GET all users
 export async function GET() {
