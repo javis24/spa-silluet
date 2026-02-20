@@ -3,13 +3,18 @@ import mysql2 from "mysql2";
 
 const globalForSequelize = global;
 
-// Verificamos si existen las variables antes de crear la instancia
-const hasCredentials = process.env.MYSQL_DATABASE && process.env.MYSQL_HOST;
+// Función para obtener la instancia solo cuando se necesite
+const getSequelize = () => {
+  if (globalForSequelize.sequelize) return globalForSequelize.sequelize;
 
-let sequelizeInstance = null;
+  const hasCredentials = process.env.MYSQL_DATABASE && process.env.MYSQL_HOST;
+  
+  if (!hasCredentials) {
+    console.warn("⚠️ Sin credenciales de DB. Saltando conexión (esto es normal en el Build).");
+    return null;
+  }
 
-if (hasCredentials) {
-  sequelizeInstance = globalForSequelize.sequelize || new Sequelize(
+  const instance = new Sequelize(
     process.env.MYSQL_DATABASE,
     process.env.MYSQL_USER,
     process.env.MYSQL_PASSWORD,
@@ -18,22 +23,18 @@ if (hasCredentials) {
       dialect: "mysql",   
       dialectModule: mysql2, 
       logging: false,
-      pool: {
-        max: 5,
-        min: 0,
-        acquire: 30000,
-        idle: 10000
-      },
+      pool: { max: 5, min: 0, acquire: 30000, idle: 10000 },
       dialectOptions: {
-        connectTimeout: 10000, // Timeout corto para fallar rápido si no conecta
+        connectTimeout: 20000, 
       }
     }
   );
-}
 
-// Exportamos la instancia (puede ser null durante el build, y eso está bien)
-export const sequelize = sequelizeInstance;
+  if (process.env.NODE_ENV !== "production") {
+    globalForSequelize.sequelize = instance;
+  }
+  
+  return instance;
+};
 
-if (process.env.NODE_ENV !== "production" && sequelizeInstance) {
-  globalForSequelize.sequelize = sequelizeInstance;
-}
+export const sequelize = getSequelize();
