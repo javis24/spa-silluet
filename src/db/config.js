@@ -1,39 +1,31 @@
 import { Sequelize } from "sequelize";
-import mysql2 from "mysql2"; 
+import mysql2 from "mysql2";
 
-const globalForSequelize = global;
-
-// Verificamos si existen las variables antes de crear la instancia
-const hasCredentials = process.env.MYSQL_DATABASE && process.env.MYSQL_HOST;
+const isBuildStep = process.env.NEXT_PHASE === 'phase-production-build' || process.env.NODE_ENV === 'production' && !process.env.MYSQL_HOST;
 
 let sequelizeInstance = null;
 
-if (hasCredentials) {
-  sequelizeInstance = globalForSequelize.sequelize || new Sequelize(
+if (!isBuildStep && process.env.MYSQL_DATABASE) {
+  sequelizeInstance = new Sequelize(
     process.env.MYSQL_DATABASE,
     process.env.MYSQL_USER,
     process.env.MYSQL_PASSWORD,
     {
       host: process.env.MYSQL_HOST,
-      dialect: "mysql",   
-      dialectModule: mysql2, 
+      dialect: "mysql",
+      dialectModule: mysql2,
       logging: false,
-      pool: {
-        max: 5,
-        min: 0,
-        acquire: 30000,
-        idle: 10000
-      },
-      dialectOptions: {
-        connectTimeout: 10000, // Timeout corto para fallar rápido si no conecta
-      }
+      pool: { max: 5, min: 0, acquire: 30000, idle: 10000 },
     }
   );
+} else {
+  console.log("µ Build detected or missing credentials: DB initialization skipped.");
+  // Exportamos un objeto dummy para que el build no explote al importar
+  sequelizeInstance = {
+    define: () => ({}),
+    sync: () => Promise.resolve(),
+    authenticate: () => Promise.resolve(),
+  };
 }
 
-// Exportamos la instancia (puede ser null durante el build, y eso está bien)
 export const sequelize = sequelizeInstance;
-
-if (process.env.NODE_ENV !== "production" && sequelizeInstance) {
-  globalForSequelize.sequelize = sequelizeInstance;
-}

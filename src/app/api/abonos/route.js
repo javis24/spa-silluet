@@ -1,3 +1,6 @@
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+
 // src/app/api/abonos/route.js
 import { NextResponse } from "next/server";
 import AbonoSemanal from "@/models/AbonoSemanal.js";
