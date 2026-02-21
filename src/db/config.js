@@ -1,19 +1,13 @@
 import { Sequelize } from "sequelize";
 import mysql2 from "mysql2";
 
-// Detectamos si estamos en el proceso de construcción de Vercel
-const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build' || !process.env.MYSQL_HOST;
-
 let sequelize;
 
-if (isBuildPhase) {
-  // Creamos un objeto "fake" para que el build no intente abrir sockets de red
-  sequelize = {
-    define: () => ({}),
-    authenticate: () => Promise.resolve(),
-    sync: () => Promise.resolve(),
-  };
-  console.log("⚠️ Fase de Build detectada: Saltando conexión real a MySQL.");
+// La fase 'phase-production-build' es cuando ocurre el error
+if (process.env.NEXT_PHASE === 'phase-production-build') {
+  sequelize = new Proxy({}, {
+    get: () => () => ({ define: () => ({}), sync: () => Promise.resolve() })
+  });
 } else {
   sequelize = new Sequelize(
     process.env.MYSQL_DATABASE,
