@@ -1,5 +1,4 @@
-export const dynamic = 'force-dynamic';
-export const fetchCache = 'force-no-store';
+
 
 
 // src/app/api/abonos/[id]/route.js
