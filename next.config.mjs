@@ -1,44 +1,39 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Modo Standalone para ahorrar mucha memoria en Vercel
+  // 1. Optimización para Vercel
   output: 'standalone',
 
-  // Paquetes externos para evitar conflictos de compilación
+  // 2. Evita que Next.js intente procesar los binarios de la DB
   serverExternalPackages: ['sequelize', 'mysql2'],
 
-  // 👇 ESTO SUSTITUYE AL COMANDO --no-lint
+  // 3. Solución al "Call retries were exceeded" (limita a un solo proceso de build)
+  experimental: {
+    workerThreads: false,
+    cpus: 1,
+  },
+
+  // 4. Saltamos validaciones pesadas para agilizar el build
   eslint: {
     ignoreDuringBuilds: true,
   },
-  
-  // Ignoramos errores de TypeScript en el build
   typescript: {
     ignoreBuildErrors: true,
   },
-  
-  webpack: (config) => {
-    config.module.exprContextCritical = false;
-    return config;
-  },
-  experimental: {
-    workerThreads: false,
-    cpus: 1
-  },
-eslint: { ignoreDuringBuilds: true },
-  typescript: { ignoreBuildErrors: true },
 
+  // 5. Configuración de Webpack para evitar errores de módulos de Node en el cliente
   webpack: (config, { isServer }) => {
+    config.module.exprContextCritical = false;
+
     if (!isServer) {
-      // Sequelize y mysql2 no deben cargarse en el cliente nunca
       config.resolve.fallback = {
         ...config.resolve.fallback,
         fs: false,
         net: false,
         tls: false,
         child_process: false,
+        dns: false,
       };
     }
-    config.module.exprContextCritical = false;
     return config;
   },
 };
