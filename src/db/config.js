@@ -1,12 +1,21 @@
 import { Sequelize } from "sequelize";
 import mysql2 from "mysql2";
 
-const isBuildStep = process.env.NEXT_PHASE === 'phase-production-build' || process.env.NODE_ENV === 'production' && !process.env.MYSQL_HOST;
+// Detectamos si estamos en el proceso de construcción de Vercel
+const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build' || !process.env.MYSQL_HOST;
 
-let sequelizeInstance = null;
+let sequelize;
 
-if (!isBuildStep && process.env.MYSQL_DATABASE) {
-  sequelizeInstance = new Sequelize(
+if (isBuildPhase) {
+  // Creamos un objeto "fake" para que el build no intente abrir sockets de red
+  sequelize = {
+    define: () => ({}),
+    authenticate: () => Promise.resolve(),
+    sync: () => Promise.resolve(),
+  };
+  console.log("⚠️ Fase de Build detectada: Saltando conexión real a MySQL.");
+} else {
+  sequelize = new Sequelize(
     process.env.MYSQL_DATABASE,
     process.env.MYSQL_USER,
     process.env.MYSQL_PASSWORD,
@@ -18,14 +27,6 @@ if (!isBuildStep && process.env.MYSQL_DATABASE) {
       pool: { max: 5, min: 0, acquire: 30000, idle: 10000 },
     }
   );
-} else {
-  console.log("µ Build detected or missing credentials: DB initialization skipped.");
-  // Exportamos un objeto dummy para que el build no explote al importar
-  sequelizeInstance = {
-    define: () => ({}),
-    sync: () => Promise.resolve(),
-    authenticate: () => Promise.resolve(),
-  };
 }
 
-export const sequelize = sequelizeInstance;
+export { sequelize };
