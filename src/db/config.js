@@ -3,15 +3,26 @@ import mysql2 from "mysql2";
 
 let sequelize;
 
-// Verificamos de múltiples formas si estamos en el Build de Vercel
 const isBuild = 
   process.env.NEXT_PHASE === 'phase-production-build' || 
-  process.env.NODE_ENV === 'production' && !process.env.MYSQL_HOST;
+  (process.env.NODE_ENV === 'production' && !process.env.MYSQL_HOST);
 
 if (isBuild) {
-  // Mock mínimo pero funcional para que los modelos no exploten al inicializarse
-  sequelize = new Sequelize('sqlite::memory:', { logging: false });
-  console.log("🛠️ Build detected: Using memory mock for Sequelize");
+  // Mock manual que no requiere librerías extras
+  sequelize = new Sequelize('database', 'username', 'password', {
+    dialect: 'mysql',
+    dialectModule: mysql2, // Usamos el que ya tienes
+    logging: false,
+  });
+  
+  // Pisamos la función de conexión para que no haga NADA
+  sequelize.connectionManager.connect = () => Promise.resolve({
+    on: () => {},
+    removeListener: () => {},
+    end: () => Promise.resolve(),
+  });
+  
+  console.log("🛠️ Build Phase: Sequelize connection blocked safely.");
 } else {
   sequelize = new Sequelize(
     process.env.MYSQL_DATABASE,
