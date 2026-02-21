@@ -3,11 +3,15 @@ import mysql2 from "mysql2";
 
 let sequelize;
 
-// La fase 'phase-production-build' es cuando ocurre el error
-if (process.env.NEXT_PHASE === 'phase-production-build') {
-  sequelize = new Proxy({}, {
-    get: () => () => ({ define: () => ({}), sync: () => Promise.resolve() })
-  });
+// Verificamos de múltiples formas si estamos en el Build de Vercel
+const isBuild = 
+  process.env.NEXT_PHASE === 'phase-production-build' || 
+  process.env.NODE_ENV === 'production' && !process.env.MYSQL_HOST;
+
+if (isBuild) {
+  // Mock mínimo pero funcional para que los modelos no exploten al inicializarse
+  sequelize = new Sequelize('sqlite::memory:', { logging: false });
+  console.log("🛠️ Build detected: Using memory mock for Sequelize");
 } else {
   sequelize = new Sequelize(
     process.env.MYSQL_DATABASE,
